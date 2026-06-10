@@ -1,0 +1,7 @@
+# Pepper dev/test dependencies (mirrors [project.optional-dependencies].dev in
+# pyproject.toml). Includes the runtime deps via -r below.
+
+-r requirements.txt
+
+pytest>=8.0
+ruff>=0.4

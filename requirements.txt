@@ -1,0 +1,10 @@
+# Pepper runtime dependencies (mirrors [project.dependencies] in pyproject.toml).
+# Canonical source is pyproject.toml — install with `pip install -e .` to get the
+# package itself plus these. This file is a convenience for `pip install -r`.
+
+mcp>=1.2.0
+pydantic>=2.5
+fastembed>=0.3
+
+# Dev/test tooling (mirrors the [dev] optional-dependencies group):
+#   pip install -r requirements-dev.txt

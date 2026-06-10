@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+
+# Secrets / env
+.env
+.env.*
+*.key
+
+# Python (Pepper backend)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Flutter / Dart (app)
+.dart_tool/
+.packages
+build/
+*.iml
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# SQLite (local data)
+*.db
+*.sqlite
+*.sqlite3
+
+# Editor
+.idea/
+.vscode/
+
+# Ruff cache
+.ruff_cache/
+
+# AI-generated planning/design docs & agent tooling state (kept local, not pushed)
+docs/superpowers/
+CLAUDE.md
+.claude/
