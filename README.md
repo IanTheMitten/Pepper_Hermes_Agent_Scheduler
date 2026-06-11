@@ -224,6 +224,3 @@ src/pepper/
 └── __main__.py    # python -m pepper
 ```
 
-## Development workflow
-
-Milestone plans live in `docs/superpowers/plans/` (M1–M7); the design spec is `docs/superpowers/specs/2026-06-03-pepper-core-design.md`. Each plan is fully specified (verbatim code, per-task TDD steps) and executed task-by-task: a fresh implementer per task, then spec-compliance + code-quality review, then a holistic milestone review, then merge to `main`. Each task is one commit (`feat:`/`fix:`/`harden:`); each milestone is a `feat/pepper-brain-mN` branch merged with `--no-ff`.
