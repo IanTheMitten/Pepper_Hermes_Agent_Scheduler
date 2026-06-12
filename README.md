@@ -16,6 +16,22 @@ At an LLM-judgment step — disambiguating an uncertain classification, or resol
 
 ## Setup
 
+### Instant setup (recommended)
+
+```bash
+git clone git@github.com:IanTheMitten/Pepper_Hermes_Agent_Scheduler.git
+cd Pepper_Hermes_Agent_Scheduler
+./setup.sh
+```
+
+`setup.sh` checks Python 3.11+, creates `.venv`, installs Pepper, runs a smoke test
+against a throwaway DB, and prints the exact MCP config block to paste into your
+agent — plug and play. Flags: `--dev` adds pytest/ruff; `--warm` pre-downloads the
+embedding model (~130 MB) so the first classification is instant. Windows: use the
+manual steps below (the script is bash, macOS/Linux).
+
+### Manual setup
+
 ```bash
 # 1. Clone the repo
 git clone git@github.com:IanTheMitten/Pepper_Hermes_Agent_Scheduler.git
@@ -139,6 +155,8 @@ Strict layering — dependencies point **downward only**:
 | `pepper_add_rule` | Add a scheduling rule |
 | `pepper_set_objective` | Set a goal/objective |
 | `pepper_get_schedule` | Read the current schedule |
+| `pepper_briefing` | Proactive day digest: schedule + overlaps, at-risk deadlines, estimate drift, looming unscheduled tasks |
+| `pepper_suggest_slot` | Rank a day's free slots for an item by learned time-of-day habit + learned duration (read-only) |
 | `pepper_mark_progress` | Record completion (only path that writes a learning observation; `actual_minutes > 0`) |
 | `pepper_cancel_item` | Cancel an item (status `cancelled`, no observation) |
 | `pepper_set_deadline` | Set/adjust an item deadline |

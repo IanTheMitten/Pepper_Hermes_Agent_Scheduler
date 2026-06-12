@@ -94,6 +94,17 @@ def list_in_range(conn: sqlite3.Connection, start: str, end: str) -> list[Item]:
     return [Item.from_row(r) for r in rows]
 
 
+def list_open_deadline_items(conn: sqlite3.Connection) -> list[Item]:
+    rows = conn.execute(
+        """
+        SELECT * FROM items
+        WHERE deadline IS NOT NULL AND status IN ('scheduled', 'in_progress')
+        ORDER BY deadline
+        """
+    ).fetchall()
+    return [Item.from_row(r) for r in rows]
+
+
 def set_scores(conn: sqlite3.Connection, item_id: int, rigidity: float, protection: float) -> None:
     conn.execute(
         "UPDATE items SET rigidity_score = ?, protection_score = ?, updated_at = ? WHERE id = ?",

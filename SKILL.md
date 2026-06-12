@@ -20,6 +20,8 @@ When Pepper hits a real decision (an ambiguous classification, or a cascade it c
 | "Meeting with X at 3pm", "lunch tomorrow noon" | `pepper_add_event` |
 | "I need to finish the deck", "remind me to call the bank" | `pepper_add_task` |
 | "What's on today?", "am I free Thursday afternoon?" | `pepper_get_schedule` |
+| "Brief me", "how's my day looking?", morning check-in | `pepper_briefing` |
+| "When should I do X?", "find time for that task" | `pepper_suggest_slot` |
 | "That's due Friday", "the report needs ~4 hours" | `pepper_set_deadline` |
 | "Done with X, took me 90 minutes" | `pepper_mark_progress` |
 | "Cancel that", "drop the gym thing" | `pepper_cancel_item` |
@@ -43,6 +45,23 @@ Capture is one call. Pepper persists the item, classifies it (embeds the title �
 - **To drop something, use `pepper_cancel_item`** — it sets status `cancelled` and writes **no** observation. **Never** call `pepper_mark_progress` to cancel; a fake/zero completion poisons the learning data.
 
 So: *finished it* → `mark_progress` with real minutes. *Not doing it* → `cancel_item`.
+
+## Day briefing — be proactive like a real PA
+
+`pepper_briefing(day)` is the one-call digest for "how's my day looking?" — and the right opener whenever a conversation starts a new day. It returns the schedule **plus** risk signals the reflex already computed:
+
+- `overlaps` — scheduled items that collide. Offer to fix via `pepper_resolve_conflict`.
+- `at_risk` — deadline tasks whose remaining effort exceeds free capacity before the deadline. Flag them; suggest moving or cutting scope.
+- `estimate_drift` — items booked for less/more time than this type *actually* takes (learned, confident data only). Suggest the learned duration; enact with `pepper_reschedule` if accepted.
+- `unscheduled_deadlines` — deadline tasks due within 7 days that have no time slot yet. Prompt the user to place them.
+
+Empty lists mean nothing to report — don't invent warnings. Mention only the non-empty signals, lead with the most urgent.
+
+## Placing a task — `pepper_suggest_slot`
+
+When the user asks *when* to do something (or a briefing surfaced an unscheduled deadline task), call `pepper_suggest_slot(item_id, day)`. Pepper ranks the day's free slots by the user's **learned time-of-day habit** for that item's type and sizes them with its **learned duration estimate** (`duration_source`: `learned` = confident history, `bias_adjusted` = seed × personal bias, `booked` = the captured estimate).
+
+It is read-only and returns up to 3 `options` (`{start, end, time_of_day, habit_score}`). Present the top option with its reasoning ("you usually do gym in the evening"), let the user confirm or pick another, then enact via `pepper_reschedule`. A `habit_score` of `null` means no history yet — present the options as neutral, don't invent a habit.
 
 ## Cascade re-flow — handling `options` and `conflicts`
 
@@ -70,6 +89,8 @@ In both `escalate` and `impossible`, **the schedule has not changed** until you 
 | `pepper_add_event` | `(title, start_time, end_time, location?, commitment?, counterparty_id?, stakes?, type_id?)` |
 | `pepper_add_task` | `(title, duration_estimate, deadline?, divisibility?, stakes?, type_id?)` |
 | `pepper_get_schedule` | `(start_time, end_time)` |
+| `pepper_briefing` | `(day)` — YYYY-MM-DD |
+| `pepper_suggest_slot` | `(item_id, day)` — YYYY-MM-DD |
 | `pepper_mark_progress` | `(…, actual_minutes>0)` |
 | `pepper_cancel_item` | `(item_id)` |
 | `pepper_reschedule` | `(item_id, new_start, new_end, day)` |

@@ -48,6 +48,11 @@ def list_types(conn: sqlite3.Connection) -> list[TypeRow]:
     return [TypeRow(id=r["id"], name=r["name"]) for r in rows]
 
 
+def get_type_name(conn: sqlite3.Connection, type_id: int) -> str | None:
+    row = conn.execute("SELECT name FROM types WHERE id = ?", (type_id,)).fetchone()
+    return row["name"] if row else None
+
+
 def find_type_by_name(conn: sqlite3.Connection, name: str) -> int | None:
     row = conn.execute("SELECT id FROM types WHERE name = ?", (name,)).fetchone()
     return row["id"] if row else None

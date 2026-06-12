@@ -14,7 +14,7 @@ from pepper.persons.resolution import resolve
 from pepper.recurrence.materializer import materialize
 from pepper.repositories import item_repo, objective_repo, person_repo, project_repo, recurrence_repo, rule_repo
 from pepper.repositories.item_repo import get_item as item_repo_get
-from pepper.services import cascade_service, classification_service, learning_service, onboarding_service, planner_service, priority_service, schedule_service
+from pepper.services import briefing_service, cascade_service, classification_service, learning_service, onboarding_service, planner_service, priority_service, schedule_service, suggestion_service
 
 mcp = FastMCP("pepper")
 
@@ -362,6 +362,32 @@ def pepper_set_objective(description: str, target_type_id: int | None = None,
         oid = objective_repo.create(conn, description, target_type_id=target_type_id,
                                     weight=weight, until=until)
         return _ok({"objective_id": oid})
+    finally:
+        conn.close()
+
+
+@mcp.tool()
+def pepper_suggest_slot(item_id: int, day: str) -> dict:
+    """Suggest where to place an item on a day (YYYY-MM-DD): ranks free slots by the
+    user's learned time-of-day habit for the item's type, using the learned duration
+    estimate. Read-only — enact a chosen option via pepper_reschedule."""
+    conn = get_connection()
+    try:
+        return _ok(suggestion_service.suggest_slots(conn, item_id, day))
+    except ValueError as exc:
+        return _err(str(exc))
+    finally:
+        conn.close()
+
+
+@mcp.tool()
+def pepper_briefing(day: str) -> dict:
+    """Proactive day briefing (day is YYYY-MM-DD): the schedule plus surfaced risks —
+    overlapping items, deadline tasks projected at risk, items whose booked duration
+    diverges from the learned actual, and looming unscheduled deadline tasks."""
+    conn = get_connection()
+    try:
+        return _ok(briefing_service.build_briefing(conn, day))
     finally:
         conn.close()
 
